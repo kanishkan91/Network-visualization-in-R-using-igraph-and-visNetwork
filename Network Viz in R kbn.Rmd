@@ -1,0 +1,109 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+```{r}
+library(igraph)
+setwd('C:/Users/Public/Rfiles')
+nodes <- read.csv("Nodes.csv", header=T, as.is=T)
+links <- read.csv("Edges.csv",, header=T, as.is=T)
+
+
+net <- graph_from_data_frame(d=links, vertices=nodes, directed=T) 
+net
+
+```
+
+```{r}
+
+library(visNetwork)
+library(igraph)
+library(dplyr)
+library(xlsx)
+setwd('C:/Users/Public/Rfiles')
+nodes <- read.csv("Nodes.csv", header=T, as.is=T)
+links <- read.csv("Edges.csv",, header=T, as.is=T)
+
+
+
+#net <- graph_from_data_frame(d=links4, vertices=nodes4, directed=FALSE) 
+#net
+
+
+#links2<- subset(links, (links$fromModule=="Education"))
+#links3<- subset(links, (links$toModule=="Education"))
+#links<- rbind(links2,links3)
+links4<- (unique(links[,1:5]))
+#nodes<- nodes[(nodes$NAME %in% (links$from)]| nodes[(nodes$NAME %in% (links$to)]
+#nodes2<- subset(nodes,(nodes$NAME %in% links4$from))
+#nodes3<- subset(nodes,(nodes$NAME %in% links4$to))
+#nodes<- rbind(nodes2,nodes3)
+nodes4<- (unique(nodes[,1:7]))
+
+net <- graph_from_data_frame(d=links4, vertices=nodes4, directed=T) 
+net
+
+
+#write.xlsx(links4, file = "links1.xlsx",
+      #sheetName = "TFPPWT", append = FALSE)
+
+#write.xlsx(nodes4, file = "nodes2.xlsx",
+      #sheetName = "TFPPWT", append = FALSE)
+
+
+
+#deg <- degree(net, mode="all")
+vis.nodes<-data.frame(id=nodes4$NAME,label=nodes4$NAME,title=nodes4$NAME,Module=nodes4$Module)
+vis.links<-data.frame(from=links4$from,to=links4$to,width=0.75,arrows=list(to=list(enabled=TRUE,scalefactor=1)))
+
+vis.nodes$shape  <- c("dot","square")[nodes4$TYPE]
+vis.nodes$shadow <- TRUE
+vis.nodes$title  <- nodes4$ID2 # Text on click
+vis.nodes$label  <- vis.nodes$id
+deg <- degree(net, mode="all")
+#vis.nodes$size   <- log(deg)*15
+vis.nodes$size   <- 12
+#vis.nodes$size[vis.nodes$size<12]<-12
+#vis.nodes$size[vis.nodes$size>24]<-24
+
+#vis.links$arrows.to.scalefactor<-deg*0.2
+
+
+vis.nodes$borderWidth <- 2
+vis.nodes$color.background <- c("Red","Blue","Green","Yellow","Orange","Grey","Purple","Azure")[vis.nodes$Module]
+vis.nodes$color.border <- "black"
+vis.nodes$color.highlight.background <- "orange"
+vis.nodes$color.highlight.border <- "darkred"
+ledges<- data.frame(color=c("Red","Blue","Green","Yellow","Orange","Grey"))
+lnodes<- data.frame(Module=c("Agriculture","Demography","Economy","Education","Energy","Environment","Health","Infrastructure","Interstate","Other","SocioPolitical"))
+#lnodes$color<-(color=c("Red","Blue","Green","Yellow","Orange","Grey"))
+
+
+
+visNetwork(vis.nodes,vis.links,height = "1500",
+                  width = "1500")%>%
+  visPhysics(stabilization = TRUE,enabled = TRUE,solver="repulsion")%>%
+  visOptions(highlightNearest = TRUE, nodesIdSelection =TRUE)
+    
+
+  
+
+
+
+
+
+```
+
+```{r}
+visSave(network,file="AllofIfs.html",selfcontained = T)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
